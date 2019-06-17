@@ -25,6 +25,8 @@ inp_header_dict = {
     '[INFILTRATION]':'Subcatchment Suction HydCon IMDmax',
     '[Polygons]':'Name X Y',
     '[REPORT]':'Param Status',
+    '[TAGS]':'ElementType Name Tag',
+    '[MAP]': 'x1 y1 x2 y2'
     #'[CURVES]':'Name Type X-Value Y-Value',
     #'[TIMESERIES]':'Name Date Time Value'
 }
@@ -41,7 +43,8 @@ rpt_header_dict={
     'Node Flooding Summary':'Name HoursFlooded MaxQ MaxDay MaxHr TotalFloodVol MaximumPondDepth',
     'Node Inflow Summary':'Name Type MaxLatInflow MaxTotalInflow MaxDay MaxHr LatInflowV TotalInflowV FlowBalErrorPerc XXX',
     'Node Surcharge Summary':'Name Type HourSurcharged MaxHeightAboveCrown MinDepthBelowRim',
-    'Node Depth Summary':'Name Type AvgDepth MaxNodeDepth MaxHGL MaxDay MaxHr',
+    'Storage Volume Summary':'Name AvgVolume AvgPctFull EvapPctLoss ExfilPctLoss MaxVolume MaxPctFull MaxDay MaxFullHr MaxOutflow',
+    'Node Depth Summary':'Name Type AvgDepth MaxNodeDepth MaxHGL MaxDay MaxHr MaxNodeDepthReported',
     'Link Flow Summary':'Name Type MaxQ MaxDay MaxHr MaxV MaxQPerc MaxDPerc',
     'Subcatchment Results':     'Date Time PrecipInchPerHour LossesInchPerHr RunoffCFS',
     'Node Results':             'Date Time InflowCFS FloodingCFS DepthFt HeadFt TSS TP TN',

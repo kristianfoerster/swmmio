@@ -1,4 +1,8 @@
 # SWMMIO
+
+[![Build status](https://ci.appveyor.com/api/projects/status/qywujm5w2wm0y2tv/branch/master?svg=true)](https://ci.appveyor.com/project/aerispaha/swmmio/branch/master) 
+[![Build Status](https://travis-ci.com/aerispaha/swmmio.svg?branch=master)](https://travis-ci.com/aerispaha/swmmio)
+
 ![Kool Picture](docs/img/impact_of_option.png?raw=true "Impact of Option")
 SWMMIO is a set of python tools aiming to provide a means for version control and visualizing results from the EPA Stormwater Management Model (SWMM). Command line tools are also provided for running models individually and in parallel via Python's `multiprocessing` module. These tools are being developed specifically for the application of flood risk management, though most functionality is applicable to SWMM modeling in general.
 
@@ -8,7 +12,7 @@ SWMMIO functions primarily by interfacing with .inp and .rpt (input and report) 
 
 
 ### Dependencies
-*  [pillow](http://python-pillow.org/): 3.0.0
+*  [pillow](http://python-pillow.org/)
 *  [matplotlib](http://matplotlib.org/)
 *  [numpy](http://www.numpy.org/)
 *  [pandas](https://github.com/pydata/pandas)
@@ -19,17 +23,13 @@ SWMMIO functions primarily by interfacing with .inp and .rpt (input and report) 
 Before installation, it's recommended to first activate a [virtualenv](https://github.com/pypa/virtualenv) to not crowd your system's package library. If you don't use any of the dependencies listed above, this step is less important. SWMMIO can be installed via pip in your command line:
 
 ```bash
-#on Windows:
-python -m pip install swmmio
-
-#on Unix-type systems, i do this:
 pip install swmmio
 ```
 
 ### Basic Usage
 The `swmmio.Model()` class provides the basic endpoint for interfacing with SWMM models. To get started, save a SWMM5 model (.inp) in a directory with its report file (.rpt). A few examples:   
 ```python
-from swmmio import swmmio
+import swmmio
 
 #instantiate a swmmio model object
 mymodel = swmmio.Model('/path/to/directory with swmm files')
@@ -68,16 +68,16 @@ what's interesting or important for your project:
 
 ```python
 #isolate nodes that have flooded for more than 30 minutes
-flooded_series = nodes.ix[nodes.HoursFlooded>0.5, 'TotalFloodVol']
+flooded_series = nodes.loc[nodes.HoursFlooded>0.5, 'TotalFloodVol']
 flood_vol = sum(flooded_series) #total flood volume (million gallons)
 flooded_count = len(flooded_series) #count of flooded nodes
 
 #highlight these nodes in a graphic
 nodes['draw_color'] = '#787882' #grey, default node color
-nodes.ix[nodes.HoursFlooded>0.5, 'draw_color'] = '#751167' #purple, flooded nodes
+nodes.loc[nodes.HoursFlooded>0.5, 'draw_color'] = '#751167' #purple, flooded nodes
 
 #set the radius of flooded nodes as a function of HoursFlooded
-nodes.ix[nodes.HoursFlooded>1, 'draw_size'] = nodes.ix[nodes.HoursFlooded>1, 'HoursFlooded'] * 12
+nodes.loc[nodes.HoursFlooded>1, 'draw_size'] = nodes.loc[nodes.HoursFlooded>1, 'HoursFlooded'] * 12
 
 #make the conduits grey, sized as function of their geometry
 conds['draw_color'] = '#787882'
@@ -96,9 +96,9 @@ For example, climate change impacts can be investigated by creating a set of mod
 
 ```python
 import os, shutil
-from swmmio import swmmio
+import swmmio
 from swmmio.utils.modify_model import replace_inp_section
-from swmmio.utils.dataframes import create_dataframeINP
+from swmmio import create_dataframeINP
 
 #initialize a baseline model object
 baseline = swmmio.Model(r'path\to\baseline.inp')
@@ -130,7 +130,19 @@ while rise <= 5:
 
 ```
 
+### Access Model Network
+The `swmmio.Model` class returns a Networkx MultiDiGraph representation of the model via that `network` parameter:
+```python
 
+#access the model as a Networkx MutliDiGraph
+G = model.network
+
+#iterate through links
+for u, v, key, data in model.network.edges(data=True, keys=True):
+
+        print (key, data['Geom1'])
+        # do stuff with the network
+```  
 
 ### Running Models
 Using the command line tool, individual SWMM5 models can be run by invoking the swmmio module in your shell as such:

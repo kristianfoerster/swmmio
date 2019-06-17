@@ -1,7 +1,7 @@
 import os, shutil
 import pandas as pd
 from swmmio.version_control.inp import INPDiff
-from definitions import *
+from swmmio.defs.config import *
 
 
 def create_map(model1, model2=None, bbox=None, crs=None, filename=None,
@@ -39,7 +39,7 @@ def create_map(model1, model2=None, bbox=None, crs=None, filename=None,
 
     geometries = [] #array of features
     #collect the links
-    for k,v in model2.list_objects('conduit', bbox, subset=subset).items():
+    for k,v in list(model2.list_objects('conduit', bbox, subset=subset).items()):
         props = {
             'MaxQPercent':v.maxQpercent,
             'id':v.id,

@@ -9,7 +9,7 @@ import os
 import sys
 from copy import deepcopy
 if sys.version_info[0] < 3:
-    from StringIO import StringIO
+    from io import StringIO
 else:
     from io import StringIO
 problem_sections = ['[CURVES]', '[TIMESERIES]', '[RDII]', '[HYDROGRAPHS]']
@@ -45,7 +45,7 @@ class BuildInstructions(object):
 
     def __add__(self, other):
         bi = BuildInstructions()
-        for section, change_obj in self.instructions.iteritems():
+        for section, change_obj in self.instructions.items():
             if section in other.instructions:
                 new_change = change_obj + other.instructions[section]
                 bi.instructions[section] = new_change
@@ -53,7 +53,7 @@ class BuildInstructions(object):
                 #section doesn't exist in other, maintain current instructions
                 bi.instructions[section] = change_obj
 
-        for section, change_obj in other.instructions.iteritems():
+        for section, change_obj in other.instructions.items():
             if section not in self.instructions:
                 bi.instructions[section] = change_obj
 
@@ -85,7 +85,7 @@ class BuildInstructions(object):
         filepath = os.path.join(dir, filename)
         with open (filepath, 'w') as f:
             vc_utils.write_meta_data(f, self.metadata)
-            for section, change_obj in self.instructions.iteritems():
+            for section, change_obj in self.instructions.items():
                 section_df = pd.concat([change_obj.removed, change_obj.altered, change_obj.added])
                 vc_utils.write_inp_section(f, allheaders=None, sectionheader=section,
                                            section_data=section_df, pad_top=False, na_fill='NaN')
@@ -149,21 +149,21 @@ class INPDiff(object):
             #find where elements were changed (but kept with same ID)
             common_ids = df1.index.difference(removed_ids) #original - removed = in common
             #both dfs concatenated, with matched indices for each element
-            full_set = pd.concat([df1.ix[common_ids], df2.ix[common_ids]])
+            full_set = pd.concat([df1.loc[common_ids], df2.loc[common_ids]])
             #drop dupes on the set, all things that did not changed should have 1 row
             changes_with_dupes = full_set.drop_duplicates()
             #duplicate indicies are rows that have changes, isolate these
             changed_ids = changes_with_dupes.index.get_duplicates()
 
-            added = df2.ix[added_ids]
+            added = df2.loc[added_ids].copy()
             added['Comment'] = 'Added'# from model {}'.format(model2.inp.path)
             added['Origin'] = model2.inp.path
 
-            altered = df2.ix[changed_ids]
+            altered = df2.loc[changed_ids].copy()
             altered['Comment'] = 'Altered'# in model {}'.format(model2.inp.path)
             altered['Origin'] = model2.inp.path
 
-            removed = df1.ix[removed_ids]
+            removed = df1.loc[removed_ids].copy()
             #comment out the removed elements
             #removed.index = ["; " + str(x) for x in removed.index]
             removed['Comment'] = 'Removed'# in model {}'.format(model2.inp.path)
@@ -243,7 +243,7 @@ def generate_inp_from_diffs(basemodel, inpdiffs, target_dir):
     #instructions applied
     with open (newinp, 'w') as f:
         for section in allheaders['order']:
-            print section
+            print(section)
             if section not in problem_sections and allheaders['headers'][section] != 'blob':
                 #check if a changes from baseline spreadheet exists, and use this
                 #information if available to create the changes array
